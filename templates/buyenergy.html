@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+     <form action="home" method="POST" style="padding-left: 10px; width: 50%">
+         <div class="form-group">
+            <label for="FullName">Name</label>
+            <input type="text" class="form-control" id="FullName" name="FullName" placeholder="Your Full Name" required>
+         </div>
+         <div class="form-group">
+            <label for="UnitsRequired">Units</label>
+            <input type="text" class="form-control" id="UnitsRequired" name="UnitsRequired" placeholder="In Numbers" required>
+         </div>
+         <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}

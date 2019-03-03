@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+    <form action="table" method="POST" style="padding-left: 10px; width: 50%">
+        <div class="form-group">
+            <label for="FullName">Name</label>
+            <input type="text" class="form-control" id="FullName" name="FullName" placeholder="Your Full Name" required>
+        </div>
+        <div class="form-group">
+            <label for="AvailableUnits">Units</label>
+            <input type="text" class="form-control" id="AvailableUnits" name="AvailableUnits" placeholder="In Numbers" required>
+        </div>
+        <div class="form-group">
+            <label for="PricePerUnit">Price Per Unit</label>
+            <input type="text" class="form-control" id="PricePerUnit" name="PricePerUnit" placeholder="In ₹(Rupees)" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+{% endblock %}
