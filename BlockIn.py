@@ -56,7 +56,8 @@ class Blockchain:
                 return False
 
             # Check that the Proof of Work is correct
-            if not self.valid_proof(last_block['proof'], block['proof'], last_block_hash):
+            if not self.valid_proof(
+                    last_block['proof'], block['proof'], last_block_hash):
                 return False
 
             last_block = block
@@ -242,8 +243,9 @@ def home():
             data.to_csv(
                 'energydemand.csv', sep=',', encoding='utf-8', index=False)
         for transaction in tlist:
-            blockchain.new_transaction(transaction['sender'],
-                                       transaction['recipient'], transaction['amount'])
+            blockchain.new_transaction(
+                transaction['sender'],
+                transaction['recipient'], transaction['amount'])
         return render_template('home.html')
     else:
         return render_template('home.html')
