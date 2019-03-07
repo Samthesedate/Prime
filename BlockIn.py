@@ -91,7 +91,7 @@ class Blockchain:
                     max_length = length
                     new_chain = chain
 
-        # Replace our chain if we discovered a new, valid chain longer than ours
+        # Replace our chain if we discovered a new, valid chain longer
         if new_chain:
             self.chain = new_chain
             return True
@@ -150,7 +150,7 @@ class Blockchain:
         :param block: Block
         """
 
-        # We must make sure that the Dictionary is Ordered, or we'll have inconsistent hashes
+        # Ordered dictionary to avoid inconsistent hashes
         block_string = json.dumps(block, sort_keys=True).encode()
         return hashlib.sha256(block_string).hexdigest()
 
@@ -237,10 +237,13 @@ def home():
                 a.update({"amount": (enerquire * data.iloc[minimum]['PPU'])})
                 tlist.append(a)
                 data.loc[minimum, 'Units'] -= enerquire
-                data.loc[minimum, 'Price'] -= enerquire * data.loc[minimum, 'PPU']
-            data.to_csv('energydemand.csv', sep=',', encoding='utf-8', index=False)
+                data.loc[minimum, 'Price'] -= \
+                    enerquire * data.loc[minimum, 'PPU']
+            data.to_csv(
+                'energydemand.csv', sep=',', encoding='utf-8', index=False)
         for transaction in tlist:
-            blockchain.new_transaction(transaction['sender'], transaction['recipient'], transaction['amount'])
+            blockchain.new_transaction(transaction['sender'],
+                                       transaction['recipient'], transaction['amount'])
         return render_template('home.html')
     else:
         return render_template('home.html')
@@ -266,17 +269,20 @@ def table():
         now = datetime.now()
         ts = now.strftime("%d-%m-%y %H:%M")
         data = pd.read_csv('energydemand.csv')
-        df1 = pd.DataFrame(data=[[name, price, units, ppu, ts]], columns=["Name", "Price", "Units", "PPU", "Time"])
+        df1 = pd.DataFrame(data=[[name, price, units, ppu, ts]], columns=[
+                           "Name", "Price", "Units", "PPU", "Time"])
         df1.to_csv('energydemand.csv', mode='a', header=False, index=False)
         data = pd.concat([data, df1], axis=0)
         data.index = range(len(data.index))
         data.index += 1
-        return render_template('table.html', data=data.to_html(), title='Table')
+        return render_template(
+            'table.html', data=data.to_html(), title='Table')
     else:
         data = pd.read_csv('energydemand.csv')
         data.index = range(len(data.index))
         data.index += 1
-        return render_template('table.html', data=data.to_html(), title='Table')
+        return render_template(
+            'table.html', data=data.to_html(), title='Table')
 
 
 @app.route('/mine', methods=['GET'])
@@ -356,7 +362,8 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
 
     parser = ArgumentParser()
-    parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
+    parser.add_argument(
+        '-p', '--port', default=5000, type=int, help='port to listen on')
     args = parser.parse_args()
     port = args.port
 
