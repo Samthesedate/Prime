@@ -287,12 +287,20 @@ def table():
             'table.html', data=data.to_html(), title='Table')
 
 
+@app.route('/transact')
+def transact():
+    data = pd.read_csv('transacttable.csv')
+    data.index = range(len(data.index))
+    data.index += 1
+    return render_template(
+        'transact.html', data=data.to_html(), title='Transactions')
+
+
 @app.route('/mine', methods=['GET'])
 def mine():
     # We run the proof of work algorithm to get the next proof...
     last_block = blockchain.last_block
     proof = blockchain.proof_of_work(last_block)
-
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
     blockchain.new_transaction(
@@ -305,14 +313,28 @@ def mine():
     previous_hash = blockchain.hash(last_block)
     block = blockchain.new_block(proof, previous_hash)
 
-    response = {
+    '''response = {
         'message': "New Block Forged",
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
-    }
-    return jsonify(response), 200
+    }'''
+
+    trans = block['transactions']
+    for i in trans[:-1]:
+        sender = i['sender']
+        recipient = i['recipient']
+        amount = i['amount']
+        data = pd.read_csv('transacttable.csv')
+        df1 = pd.DataFrame(data=[[sender, recipient, amount]], columns=[
+            "Sender", "Recipient", "Amount"])
+        df1.to_csv('transacttable.csv', mode='a', header=False, index=False)
+        data = pd.concat([data, df1], axis=0)
+        data.index = range(len(data.index))
+        data.index += 1
+    return render_template(
+        'transact.html', data=data.to_html(), title='Transactions')
 
 
 @app.route('/chain', methods=['GET'])
