@@ -287,6 +287,15 @@ def table():
             'table.html', data=data.to_html(), title='Table')
 
 
+@app.route('/transact')
+def transact():
+    data = pd.read_csv('transacttable.csv')
+    data.index = range(len(data.index))
+    data.index += 1
+    return render_template(
+        'transact.html', data=data.to_html(), title='Transactions')
+
+
 @app.route('/mine', methods=['GET'])
 def mine():
     # We run the proof of work algorithm to get the next proof...
@@ -304,13 +313,13 @@ def mine():
     previous_hash = blockchain.hash(last_block)
     block = blockchain.new_block(proof, previous_hash)
 
-    response = {
+    '''response = {
         'message': "New Block Forged",
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
-    }
+    }'''
 
     trans = block['transactions']
     for i in trans[:-1]:
@@ -320,13 +329,12 @@ def mine():
         data = pd.read_csv('transacttable.csv')
         df1 = pd.DataFrame(data=[[sender, recipient, amount]], columns=[
             "Sender", "Recipient", "Amount"])
+        df1.to_csv('transacttable.csv', mode='a', header=False, index=False)
         data = pd.concat([data, df1], axis=0)
         data.index = range(len(data.index))
         data.index += 1
-        df1.to_csv('transacttable.csv', mode='a', header=False, index=False)
-        # return render_template('transact.html', data=data.to_html(), title='Transact')
-
-        return jsonify(response), 200
+    return render_template(
+        'transact.html', data=data.to_html(), title='Transactions')
 
 
 @app.route('/chain', methods=['GET'])
