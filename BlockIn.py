@@ -292,7 +292,6 @@ def mine():
     # We run the proof of work algorithm to get the next proof...
     last_block = blockchain.last_block
     proof = blockchain.proof_of_work(last_block)
-
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
     blockchain.new_transaction(
@@ -312,7 +311,22 @@ def mine():
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
     }
-    return jsonify(response), 200
+
+    trans = block['transactions']
+    for i in trans[:-1]:
+        sender = i['sender']
+        recipient = i['recipient']
+        amount = i['amount']
+        data = pd.read_csv('transacttable.csv')
+        df1 = pd.DataFrame(data=[[sender, recipient, amount]], columns=[
+            "Sender", "Recipient", "Amount"])
+        data = pd.concat([data, df1], axis=0)
+        data.index = range(len(data.index))
+        data.index += 1
+        df1.to_csv('transacttable.csv', mode='a', header=False, index=False)
+        # return render_template('transact.html', data=data.to_html(), title='Transact')
+
+        return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
