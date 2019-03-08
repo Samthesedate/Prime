@@ -209,6 +209,7 @@ def homepage():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    # Create a local list to store dictionary of transactions
     tlist = []
     if request.method == 'POST':
         data = pd.read_csv('energydemand.csv')  # Reading the CSV file
@@ -263,6 +264,11 @@ def sellenergy():
 
 @app.route('/table', methods=['GET', 'POST'])
 def table():
+    '''
+    Acquire the values of the seller from the HTTP Form
+    Add The Current DateTime
+    Add it to the table for convenience of the general participant
+    '''
     if request.method == 'POST':
         name = request.form['FullName']
         units = float(request.form['AvailableUnits'])
@@ -289,6 +295,7 @@ def table():
 
 @app.route('/transact')
 def transact():
+    # List of transactions that have been mined/approved
     data = pd.read_csv('transacttable.csv')
     data.index = range(len(data.index))
     data.index += 1
@@ -313,28 +320,29 @@ def mine():
     previous_hash = blockchain.hash(last_block)
     block = blockchain.new_block(proof, previous_hash)
 
-    '''response = {
+    response = {
         'message': "New Block Forged",
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
-    }'''
-
+    }
     trans = block['transactions']
     for i in trans[:-1]:
         sender = i['sender']
         recipient = i['recipient']
         amount = i['amount']
+        now = datetime.now()
+        ts = now.strftime("%d-%m-%y %H:%M")
         data = pd.read_csv('transacttable.csv')
-        df1 = pd.DataFrame(data=[[sender, recipient, amount]], columns=[
-            "Sender", "Recipient", "Amount"])
+        df1 = pd.DataFrame(data=[[sender, recipient, amount, ts]], columns=[
+            "Sender", "Recipient", "Amount", "Time"])
         df1.to_csv('transacttable.csv', mode='a', header=False, index=False)
         data = pd.concat([data, df1], axis=0)
         data.index = range(len(data.index))
         data.index += 1
-    return render_template(
-        'transact.html', data=data.to_html(), title='Transactions')
+
+    return jsonify(response), 200
 
 
 @app.route('/chain', methods=['GET'])
